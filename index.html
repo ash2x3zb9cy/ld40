@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+
+	<script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+	<script src="game.js"></script>
+	<script src="cards.js"></script>
+
+	<style>
+		#hand .card {
+			background-color: #ffd700;
+			display: inline-block;
+			margin: 5px;
+			width: 9em;
+			height: 12em;
+			padding: 1em;
+			text-align: center;
+			vertical-align: top;
+			border: 1px solid #a38d1c;
+		}
+
+		#hand .token {
+			background-color: red;
+		}
+
+		#discard .card {
+			background-color: #ffd70080;
+			display:inline-block;
+			margin: 5px;
+			width: 9em;
+			height: 4em;
+			padding: 1em;
+			text-align: center;
+			vertical-align: top;
+			border: 1px solid purple;
+		}
+
+		#discard .card .cardtext {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="hand"></div>
+
+	<strong>Discard:</strong>
+	<div id="discard"></div>
+
+	<div id="deck"></div>
+
+	<button id="endturn">End Turn</button>
+
+	Actions:<span id="actions"></span>
+
+	<br>
+
+	Cards trashed:<span id="trashed">0</span>
+
+</body>
+</html>
