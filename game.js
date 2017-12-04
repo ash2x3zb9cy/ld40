@@ -72,7 +72,7 @@ function modActions(diff) {
 
 function playCard(card) {
 	if (game.actions < 1) return false;
-	game.log("Playing card " + card.name)	
+	game.log("Playing card " + (card.name || "UNKNOWN"))
 
 	// remove from hand
 	let i = game.hand.indexOf(card);
@@ -102,7 +102,7 @@ function updateDiscard() {
 		$card.addClass("discard");
 
 		$('#discard').append($card);
-		
+
 	}
 
 }
@@ -195,6 +195,31 @@ function discardCard(c) {
 	game.discard.push(c);
 }
 
+function upgradeClickCard(e) {
+	let card = $(e.currentTarget).data().card;
+	let upgr = card.upgrade();
+	if (upgr) {
+		// reset event listeners
+		$('.card').off('click');
+		$('.card').on('click', clickCard);
+
+		// delete the old card without trashing
+		let i = game.hand.indexOf(card);
+		if (i > -1) {
+			game.hand.splice(i, 1);
+		}
+		$(e.currentTarget).remove();
+		card = null;
+
+		// put the upgraded card in discard
+		discardCard(upgr);
+		return true;
+	} else {
+		game.log("That card has no upgrades");
+		return false;
+	}
+}
+
 function shuffle(arr) {
 	// Fisher-Yates shuffle
 	for (var i = 0; i < arr.length-1; i++) {
@@ -210,10 +235,36 @@ function randint(min, max) {
 	return Math.floor(Math.random() * (max - min)) + min;
 }
 
+COLLECTIBLE_CARDS = [
+	()=>new PotOfGreed(),
+	()=>new Audacity(),
+	()=>new PyramidScheme(),
+	()=>new ToxicAsset(),
+	()=>new LawyerUp(),
+	()=>new PowerShutdown(),
+]
+
+function getRandomInt(min, max) {
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+function newCard() {
+	return COLLECTIBLE_CARDS[getRandomInt(0, COLLECTIBLE_CARDS.length)]();
+}
+
 $(function() {
-	game.deck = [new PyramidScheme3(), new PyramidScheme()];
+	game.deck = [
+		new PotOfGreed(),
+		new Audacity(),
+		new PyramidScheme(),
+		new ToxicAsset(),
+		new LawyerUp(),
+		new PowerShutdown(),
+	];
 	shuffle(game.deck);
-	game.discard = [new PrintDummy(), new PrintDummy(), new PrintDummy()]
+	game.discard = [];
 	game.hand = [];
 	game.inplay = [];
 	game.actions = 0;
@@ -226,7 +277,7 @@ $(function() {
 	updateDeck();
 	updateDiscard();
 
-	drawCard(2);
+	drawCard(5);
 
 
 	$('#endturn').click(endTurn)
@@ -247,7 +298,7 @@ function endTurn() {
 
 	$('.card').remove();
 
-	
+
 	shuffle(game.deck);
 
 	game.actions = 0;
@@ -256,11 +307,16 @@ function endTurn() {
 
 	drawCard(5);
 
+
+
+	// check for win
+	if (game.hand.length + game.deck.length + game.inplay.length + game.discard.length < game.trashed) {
+		alert('You win!');
+	}
+
+	game.deck.push(newCard());
+
 	updateDiscard();
 	updateDeck();
 
-	// check for win
-	if (game.hand.length + game.deck.length < game.trashed) {
-		alert('You win!');
-	}
 }
